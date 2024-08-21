@@ -1,16 +1,21 @@
 package com.stance.interfaces;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 public class ProjectDto {
 
-    public record EnrollInfo(String position,
-                             List<String> tools,
+    public record EnrollInfo(String nickName,
+                            String position,
+                             List<Tools> tools,
                              String years,
                              Integer involvements){
         public void validate(){
+            if(nickName.isEmpty()){
+                throw new IllegalArgumentException("닉네임이 비어있습니다.");
+            }
             if(position.isEmpty()){
                 throw new IllegalArgumentException("포지션이 비어있습니다.");
             }
@@ -21,7 +26,7 @@ public class ProjectDto {
                 throw new IllegalArgumentException("경력이 비어있습니다.");
             }
             if(involvements <= 0){
-                throw new IllegalArgumentException("참여도는 0보다 커야 합니다.");
+                throw new IllegalArgumentException("참여횟수는 0보다 커야 합니다.");
             }
         }
     }
@@ -36,11 +41,29 @@ public class ProjectDto {
             project.validate();
         }
     }
+    public record Tools(String stackName){
+
+    }
+    public record CrewInfo(String githubName,
+                           String githubEmail,
+                           String nickName,
+                           String position,
+                           List<Tools> tools,
+                           Long years
+    ){
+
+    }
+    public record RecruitmentInfo(String position,
+                                  List<Tools> tools,
+                                  Long years
+
+    ){
+    }
 
     public record ProjectInfo(String projectName,
                               String description,
-                              Map<String,String> crewInfo,
-                              Map<String,String> recruitmentInfo,
+                              List<CrewInfo> crewInfo,
+                              List<RecruitmentInfo> recruitmentInfo,
                               DurationInfo expectedProjectDuration,
                               DurationInfo expectedRecruitmentDuration){
         public void validate(){

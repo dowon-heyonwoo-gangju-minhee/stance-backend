@@ -19,13 +19,15 @@ import java.util.Map;
 public class ProjectController {
 
     ProjectDto.DurationInfo timeInfo = new ProjectDto.DurationInfo(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-
+    ProjectDto.Tools tools = new ProjectDto.Tools("tools");
+    ProjectDto.CrewInfo crewInfo = new ProjectDto.CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new ProjectDto.Tools("tools")), 1L);
+    ProjectDto.RecruitmentInfo recruitmentInfo =new ProjectDto.RecruitmentInfo("position", List.of(new ProjectDto.Tools("tools")), 1L);
     ProjectDto.ProjectInfo projectInfo = new ProjectDto.ProjectInfo("ProjectName",
-            "Description", Map.of("crewInfo", "recruitmentInfo")
-            , Map.of("recruitmentInfo", "recruitmentInfo")
+            "Description", List.of(crewInfo)
+            , List.of(recruitmentInfo)
             , timeInfo, timeInfo);
 
-    ProjectDto.EnrollInfo enrollInfo = new ProjectDto.EnrollInfo("position", List.of("tools"), "4", 1);
+    ProjectDto.EnrollInfo enrollInfo = new ProjectDto.EnrollInfo("gangju","position", List.of(tools), "4", 1);
 
     @Operation(summary = "모든 프로젝트 조회", description = "등록된 모든 프로젝트의 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 프로젝트 목록을 반환함",

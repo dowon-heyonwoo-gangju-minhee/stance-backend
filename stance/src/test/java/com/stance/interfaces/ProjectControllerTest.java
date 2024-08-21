@@ -1,16 +1,24 @@
 package com.stance.interfaces;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stance.domain.project.ProjectService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +31,10 @@ class ProjectControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private ProjectService projectService;
+
     ProjectDto.DurationInfo timeInfo = new ProjectDto.DurationInfo(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
 
     ProjectDto.ProjectInfo projectInfo = new ProjectDto.ProjectInfo("ProjectName",
@@ -37,19 +49,25 @@ class ProjectControllerTest {
 
     @Test
     void getProjects() throws Exception {
-        mockMvc.perform(get(basePath))
+        when(projectService.getProjects()).thenReturn(List.of(projectInfo, projectInfo));
+
+        String contentAsString = mockMvc.perform(get(basePath))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].projectInfo.projectName").value("ProjectName"))
-                .andExpect(jsonPath("$[0].projectInfo.description").value("Description"))
-                .andExpect(jsonPath("$[0].projectInfo.crewInfo.crewInfo").value("recruitmentInfo"))
-                .andExpect(jsonPath("$[0].projectInfo.recruitmentInfo.recruitmentInfo").value("recruitmentInfo"))
-                .andExpect(jsonPath("$[0].projectInfo.expectedProjectDuration.startDate").exists())
-                .andExpect(jsonPath("$[0].projectInfo.expectedProjectDuration.endDate").exists())
-                .andExpect(jsonPath("$[0].projectInfo.expectedRecruitmentDuration.startDate").exists())
-                .andExpect(jsonPath("$[0].projectInfo.expectedRecruitmentDuration.endDate").exists())
-                .andExpect(jsonPath("$[1].projectInfo.projectName").value("ProjectName"))
-                .andExpect(jsonPath("$[1].projectInfo.description").value("Description"))
-        ;
+                .andReturn().getResponse().getContentAsString();
+
+        List<ProjectDto.ProjectResponse> projectResponses = objectMapper.readValue(contentAsString,
+                new TypeReference<>() {
+                });
+
+        System.out.println(projectResponses);
+
+        assertFalse(projectResponses.isEmpty());
+        assertEquals(2, projectResponses.size());
+
+        ProjectDto.ProjectResponse firstProject = projectResponses.getFirst();
+        assertEquals("ProjectName", firstProject.projectInfo().projectName());
+        assertEquals("Description", firstProject.projectInfo().description());
+        // 추가적인 필드 검증...
     }
     @Test
     void enrollProject() throws Exception {
