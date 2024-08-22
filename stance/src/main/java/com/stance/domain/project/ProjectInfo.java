@@ -11,8 +11,8 @@ import java.util.List;
 
 public record ProjectInfo(
         String projectName, String description,
-        List<CrewInfo> crewInfo, List<RecruitmentInfo> recruitmentInfoEntity,
-        ExpectedProjectDuration expectedProjectDurationEntity, ExpectedRecruitmentDuration expectedRecruitmentDurationEntity
+        List<CrewInfo> crewInfo, List<RecruitmentInfo> recruitmentInfo,
+        ExpectedProjectDuration expectedProjectDuration, ExpectedRecruitmentDuration expectedRecruitmentDuration
 ) {
 
     public static List<ProjectInfo> from(List<ProjectEntity> projectEntities) {
@@ -45,13 +45,13 @@ public record ProjectInfo(
         if (crewInfo.isEmpty()) {
             throw new IllegalArgumentException("크루 정보가 비어있습니다.");
         }
-        if (recruitmentInfoEntity.isEmpty()) {
+        if (recruitmentInfo.isEmpty()) {
             throw new IllegalArgumentException("모집 정보가 비어있습니다.");
         }
-        if (expectedProjectDurationEntity == null) {
+        if (expectedProjectDuration == null) {
             throw new IllegalArgumentException("예상 프로젝트 기간이 비어있습니다.");
         }
-        if (expectedRecruitmentDurationEntity == null) {
+        if (expectedRecruitmentDuration == null) {
             throw new IllegalArgumentException("예상 모집 기간이 비어있습니다.");
         }
     }

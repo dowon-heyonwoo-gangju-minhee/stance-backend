@@ -44,9 +44,9 @@ public class ProjectService {
                 project.projectName(),
                 project.description(),
                 CrewInfo.toEntity(project.crewInfo()),
-                RecruitmentInfo.toEntity(project.recruitmentInfoEntity()),
-                ExpectedProjectDuration.toEntity(project.expectedProjectDurationEntity()),
-                ExpectedRecruitmentDuration.toEntity(project.expectedRecruitmentDurationEntity())
+                RecruitmentInfo.toEntity(project.recruitmentInfo()),
+                ExpectedProjectDuration.toEntity(project.expectedProjectDuration()),
+                ExpectedRecruitmentDuration.toEntity(project.expectedRecruitmentDuration())
         );
         ProjectEntity savedProjectEntity = projectRepository.save(projectEntity);
         return ProjectInfo.from(savedProjectEntity);
@@ -63,9 +63,9 @@ public class ProjectService {
                 projectInfo.projectName(),
                 projectInfo.description(),
                 CrewInfo.toEntity(projectInfo.crewInfo()),
-                RecruitmentInfo.toEntity(projectInfo.recruitmentInfoEntity()),
-                ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDurationEntity()),
-                ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDurationEntity())
+                RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
+                ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
+                ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
         );
         ProjectEntity save = projectRepository.save(updatedProjectEntity);
         return ProjectInfo.from(save);
