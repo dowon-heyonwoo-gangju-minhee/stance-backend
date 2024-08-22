@@ -2,19 +2,25 @@ package com.stance.interfaces;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stance.domain.project.ProjectService;
+import com.stance.application.ProjectService;
+import com.stance.domain.crew.CrewInfo;
+import com.stance.domain.crew.RecruitmentInfo;
+import com.stance.domain.period.ExpectedProjectDuration;
+import com.stance.domain.period.ExpectedRecruitmentDuration;
+import com.stance.domain.project.*;
+import com.stance.domain.tools.Tools;
+import com.stance.interfaces.project.ProjectController;
+import com.stance.interfaces.project.ProjectDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,16 +41,18 @@ class ProjectControllerTest {
     @MockBean
     private ProjectService projectService;
 
-    ProjectDto.DurationInfo timeInfo = new ProjectDto.DurationInfo(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
 
-    ProjectDto.ProjectInfo projectInfo = new ProjectDto.ProjectInfo("ProjectName",
-            "Description", Map.of("crewInfo", "recruitmentInfo")
-            , Map.of("recruitmentInfo", "recruitmentInfo")
-            , timeInfo, timeInfo);
+    ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
+    ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
+    List<Tools> tools = Collections.singletonList(new Tools("tools"));
+    ProjectInfo projectInfo = new ProjectInfo("ProjectName",
+            "Description",List.of(new CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new Tools("react")), 1L))
+            , List.of(new RecruitmentInfo("position",List.of(new Tools("react")), 1L))
+            , expectedProjectDuration, expectedRecruitmentDuration);
 
-    ProjectDto.EnrollInfo enrollInfo = new ProjectDto.EnrollInfo("position", List.of("tools"), "4", 1);
-    ProjectDto.ProjectEnrollRequest projectEnrollRequest = new ProjectDto.ProjectEnrollRequest(enrollInfo);
-    ProjectDto.ProjectCreationRequest projectCreationRequest = new ProjectDto.ProjectCreationRequest(enrollInfo,projectInfo);
+    private final String projectName = "ProjectName";
+    ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName,);
+    ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(enrollInfo,projectInfo);
 
 
     @Test
@@ -73,7 +81,7 @@ class ProjectControllerTest {
     void enrollProject() throws Exception {
         mockMvc.perform(post(basePath+"/enroll")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(projectEnrollRequest)))
+                        .content(objectMapper.writeValueAsString(enrollRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.enrollInfo.position").value("position"))
                 .andExpect(jsonPath("$.enrollInfo.tools[0]").value("tools"))
@@ -84,7 +92,7 @@ class ProjectControllerTest {
     void createProject() throws Exception {
         mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(projectCreationRequest)))
+                        .content(objectMapper.writeValueAsString(creationRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.projectInfo.projectName").value("ProjectName"))
                 .andExpect(jsonPath("$.projectInfo.description").value("Description"))

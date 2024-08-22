@@ -6,4 +6,10 @@ import java.util.List;
 
 public interface ProjectRepository {
     List<ProjectEntity> getAll();
+
+    ProjectEntity save(ProjectEntity projectEntity);
+
+    ProjectEntity getByProjectName(String projectName);
+
+    void delete(ProjectEntity projectEntity);
 }

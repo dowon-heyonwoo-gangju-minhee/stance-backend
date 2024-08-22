@@ -1,55 +1,75 @@
 package com.stance.infra.project;
 
+import com.stance.infra.crew.CrewInfoEntity;
+import com.stance.infra.crew.RecruitmentInfoEntity;
+import com.stance.infra.period.ExpectedProjectDurationEntity;
+import com.stance.infra.period.ExpectedRecruitmentDurationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "project")
 public class ProjectEntity {
     @Id
     private Long id;
-    @Getter
     private String projectName;
-    @Getter
     private String description;
 
-    @Getter
     @OneToMany
     @JoinColumn(name = "project_id")
     private List<CrewInfoEntity> crewInfoEntity;
 
-    @Getter
     @OneToMany
     @JoinColumn(name = "project_id")
-    private List<RecruitmentInfo> recruitmentInfo;
+    private List<RecruitmentInfoEntity> recruitmentInfoEntity;
 
-    @Getter
     @ManyToOne
     @JoinColumn(name = "expected_project_duration_id")
-    private ExpectedProjectDuration expectedProjectDuration;
+    private ExpectedProjectDurationEntity expectedProjectDurationEntity;
 
-    @Getter
     @ManyToOne
     @JoinColumn(name = "expected_recruitment_duration_id")
-    private ExpectedRecruitmentDuration expectedRecruitmentDuration;
+    private ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity;
 
 
 
     public ProjectEntity(String projectName, String description,
-                         List<CrewInfoEntity> crewInfoEntity, List<RecruitmentInfo> recruitmentInfo,
-                         ExpectedProjectDuration expectedProjectDuration,
-                         ExpectedRecruitmentDuration expectedRecruitmentDuration) {
+                         List<CrewInfoEntity> crewInfoEntity, List<RecruitmentInfoEntity> recruitmentInfoEntity,
+                         ExpectedProjectDurationEntity expectedProjectDurationEntity,
+                         ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity) {
         this.projectName = projectName;
         this.description = description;
         this.crewInfoEntity = crewInfoEntity;
-        this.recruitmentInfo = recruitmentInfo;
-        this.expectedProjectDuration = expectedProjectDuration;
-        this.expectedRecruitmentDuration = expectedRecruitmentDuration;
+        this.recruitmentInfoEntity = recruitmentInfoEntity;
+        this.expectedProjectDurationEntity = expectedProjectDurationEntity;
+        this.expectedRecruitmentDurationEntity = expectedRecruitmentDurationEntity;
     }
 
     public ProjectEntity() {
 
+    }
+
+    public ProjectEntity(Long id, String projectName, String description,
+                         List<CrewInfoEntity> crewInfoEntity, List<RecruitmentInfoEntity> recruitmentInfoEntity,
+                         ExpectedProjectDurationEntity expectedProjectDurationEntity, ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity) {
+        this.id = id;
+        this.projectName = projectName;
+        this.description = description;
+        this.crewInfoEntity = crewInfoEntity;
+        this.recruitmentInfoEntity = recruitmentInfoEntity;
+        this.expectedProjectDurationEntity = expectedProjectDurationEntity;
+        this.expectedRecruitmentDurationEntity = expectedRecruitmentDurationEntity;
+
+    }
+
+    public void addCrewInfo(CrewInfoEntity entity) {
+        if(crewInfoEntity == null) {
+            crewInfoEntity = new ArrayList<>();
+        }
+        crewInfoEntity.add(entity);
     }
 }
