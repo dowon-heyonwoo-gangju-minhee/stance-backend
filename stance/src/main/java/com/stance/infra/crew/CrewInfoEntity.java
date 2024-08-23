@@ -1,5 +1,6 @@
 package com.stance.infra.crew;
 
+import com.stance.infra.membership.MembershipEntity;
 import com.stance.infra.tools.ToolsEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import java.util.List;
 @Table(name="crew_info")
 public class CrewInfoEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Getter
@@ -28,6 +30,9 @@ public class CrewInfoEntity {
     @OneToMany
     @JoinColumn(name = "crew_info_id")
     private List<ToolsEntity> tools;
+
+    @OneToMany(mappedBy = "crew")
+    private List<MembershipEntity> memberships;
 
     private Long years;
 

@@ -2,9 +2,10 @@ package com.stance.interfaces;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stance.application.ProjectFacade;
 import com.stance.domain.project.ProjectService;
 import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.RecruitmentInfo;
+import com.stance.domain.recruitment.RecruitmentInfo;
 import com.stance.domain.period.ExpectedProjectDuration;
 import com.stance.domain.period.ExpectedRecruitmentDuration;
 import com.stance.domain.project.*;
@@ -39,20 +40,22 @@ class ProjectControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ProjectService projectService;
-
+    private ProjectFacade projectFacade;
 
     ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
     ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
     List<Tools> tools = Collections.singletonList(new Tools("tools"));
+    private final String crewEmail = "crewEmail";
     ProjectInfo projectInfo = new ProjectInfo("ProjectName",
-            "Description",List.of(new CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new Tools("react")), 1L))
+            "Description",new CrewInfo("githubName", "githubEmail", "nickName", "position", tools, 1L)
             , List.of(new RecruitmentInfo("position",List.of(new Tools("react")), 1L))
             , expectedProjectDuration, expectedRecruitmentDuration);
 
     private final String projectName = "ProjectName";
-    ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName,);
-    ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(enrollInfo,projectInfo);
+    ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName,crewEmail);
+    ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(projectInfo);
+    @Autowired
+    private ProjectService projectService;
 
 
     @Test

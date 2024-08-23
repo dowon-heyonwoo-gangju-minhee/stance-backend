@@ -1,7 +1,7 @@
-package com.stance.domain.crew;
+package com.stance.domain.recruitment;
 
 import com.stance.domain.tools.Tools;
-import com.stance.infra.crew.RecruitmentInfoEntity;
+import com.stance.infra.recruitment.RecruitmentInfoEntity;
 
 import java.util.List;
 

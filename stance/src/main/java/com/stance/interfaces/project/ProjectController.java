@@ -1,5 +1,6 @@
 package com.stance.interfaces.project;
 
+import com.stance.application.ProjectFacade;
 import com.stance.domain.project.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,9 +16,11 @@ import java.util.List;
 @RequestMapping("/api/projects")
 @Tag(name = "Project", description = "프로젝트 관리 API")
 public class ProjectController {
+    private final ProjectFacade projectFacade;
     private final ProjectService projectService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectFacade projectFacade, ProjectService projectService) {
+        this.projectFacade = projectFacade;
         this.projectService = projectService;
     }
 
@@ -37,7 +40,7 @@ public class ProjectController {
     public ProjectDto.EnrollResponse enrollProject(@RequestBody ProjectDto.EnrollRequest request) {
         request.validate();
         return ProjectMapper.toPostResponse(
-                projectService.enrollProject(
+                projectFacade.enrollProject(
                         ProjectMapper.toEnroll(request)
                 )
         );
@@ -50,7 +53,7 @@ public class ProjectController {
     public ProjectDto.CreationResponse createProject(@RequestBody ProjectDto.CreationRequest request) {
         request.validate();
         return new ProjectDto.CreationResponse(
-                projectService.createProject(
+                projectFacade.createProject(
                         ProjectMapper.toCreate(request.project())
                 )
         );
@@ -65,7 +68,7 @@ public class ProjectController {
             @Parameter(description = "수정할 프로젝트 정보") @RequestBody ProjectDto.ModifyRequest request)
      {
         return ProjectMapper.toPatchResponse(
-                projectService.patchProject(
+                projectFacade.patchProject(
                         ProjectMapper.toPatch(projectName,request))
         );
     }
@@ -77,7 +80,7 @@ public class ProjectController {
     public ProjectDto.DeleteResponse deleteProject(
             @Parameter(description = "삭제할 프로젝트의 ID") @PathVariable String projectName) {
         return ProjectMapper.toDeleteResponse(
-                projectService.deleteProject(projectName), projectName
+                projectFacade.deleteProject(projectName), projectName
         );
     }
 }

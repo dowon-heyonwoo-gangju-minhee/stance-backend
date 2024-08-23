@@ -23,7 +23,7 @@ public class ProjectMapper {
     }
 
     public static ProjectCommand.Apply toEnroll(ProjectDto.EnrollRequest request) {
-        return new ProjectCommand.Apply(request.projectName(), request.crewInfo());
+        return new ProjectCommand.Apply(request.projectName(), request.crewEmail());
     }
 
     public static ProjectDto.ProjectResponse toPatchResponse(ProjectInfo projectInfo) {

@@ -1,17 +1,11 @@
 package com.stance.domain.project;
 
-import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.CrewMapper;
-import com.stance.domain.crew.RecruitmentInfo;
-import com.stance.domain.period.ExpectedProjectDuration;
-import com.stance.domain.period.ExpectedRecruitmentDuration;
-import com.stance.infra.crew.CrewInfoEntity;
 import com.stance.infra.project.ProjectEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-@Service
+
+@Component
 public class ProjectService {
     private final ProjectRepository projectRepository;
 
@@ -24,56 +18,26 @@ public class ProjectService {
         return ProjectInfo.from(projectEntities);
     }
 
-    @Transactional
-    public ProjectInfo enrollProject(ProjectCommand.Apply command) {
-        String projectName = command.projectName();
-        CrewInfo crewInfo = command.crewInfo();
-        CrewInfoEntity entity = CrewMapper.toEntity(crewInfo);
-        ProjectEntity projectInfo = projectRepository.getByProjectName(projectName);
-        projectInfo.addCrewInfo(entity);
-        ProjectEntity savedProjectEntity = projectRepository.save(projectInfo);
-        return ProjectInfo.from(savedProjectEntity);
+    public ProjectEntity getByProjectName(String projectName) {
+        return projectRepository.getByProjectName(projectName);
     }
 
-    @Transactional
-    public ProjectInfo createProject(ProjectCommand.Create command) {
-        ProjectInfo projectInfo = command.projectInfo();
-
-        ProjectEntity projectEntity = new ProjectEntity(
-                projectInfo.projectName(),
-                projectInfo.description(),
-                CrewInfo.toEntity(projectInfo.crewInfo()),
-                RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
-                ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
-                ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
-        );
-        ProjectEntity savedProjectEntity = projectRepository.save(projectEntity);
-        return ProjectInfo.from(savedProjectEntity);
+    public ProjectEntity save(ProjectEntity projectInfo) {
+        return projectRepository.save(projectInfo);
     }
 
-    @Transactional
-    public ProjectInfo patchProject(ProjectCommand.Patch patch) {
-        String projectName = patch.projectName();
-        ProjectInfo projectInfo = patch.projectInfo();
-        ProjectEntity projectEntity = projectRepository.getByProjectName(projectName);
-        Long id = projectEntity.getId();
-        ProjectEntity updatedProjectEntity = new ProjectEntity(
-                id,
-                projectInfo.projectName(),
-                projectInfo.description(),
-                CrewInfo.toEntity(projectInfo.crewInfo()),
-                RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
-                ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
-                ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
-        );
-        ProjectEntity save = projectRepository.save(updatedProjectEntity);
-        return ProjectInfo.from(save);
-    }
-
-    @Transactional
-    public Boolean deleteProject(String projectName) {
-        ProjectEntity projectEntity = projectRepository.getByProjectName(projectName);
+    public void delete(ProjectEntity projectEntity) {
         projectRepository.delete(projectEntity);
-        return true;
+    }
+
+    public Long getIdByProjectName(String projectName) {
+        return projectRepository.getIdByProjectName(projectName);
+    }
+
+    public void checkDuplicateProjectName(String s) {
+        ProjectEntity byProjectName = projectRepository.getByProjectName(s);
+        if (byProjectName != null) {
+            throw new IllegalArgumentException("Project name is duplicated");
+        }
     }
 }

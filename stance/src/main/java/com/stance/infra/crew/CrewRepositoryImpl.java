@@ -16,4 +16,9 @@ public class CrewRepositoryImpl implements CrewRepository {
         return crewJPARepository.save(crewInfoEntity);
 
     }
+
+    @Override
+    public CrewInfoEntity getByCrewEmail(String crewEmail) {
+        return crewJPARepository.findByCrewEmail(crewEmail);
+    }
 }
