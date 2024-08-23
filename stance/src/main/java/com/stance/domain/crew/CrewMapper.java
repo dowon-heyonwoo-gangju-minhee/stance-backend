@@ -1,7 +1,7 @@
 package com.stance.domain.crew;
 
+import com.stance.domain.tools.Tools;
 import com.stance.infra.crew.CrewInfoEntity;
-import com.stance.infra.tools.ToolsMapper;
 
 public class CrewMapper {
     public static CrewInfoEntity toEntity(CrewInfo create) {
@@ -10,7 +10,7 @@ public class CrewMapper {
                 create.githubEmail(),
                 create.nickName(),
                 create.position(),
-                ToolsMapper.toEntities(create.tools()),
+                Tools.toEntity(create.tools()),
                 create.years()
         );
     }

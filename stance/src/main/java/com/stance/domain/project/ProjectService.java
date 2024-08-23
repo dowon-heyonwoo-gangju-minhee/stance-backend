@@ -1,13 +1,10 @@
-package com.stance.application;
+package com.stance.domain.project;
 
 import com.stance.domain.crew.CrewInfo;
 import com.stance.domain.crew.CrewMapper;
 import com.stance.domain.crew.RecruitmentInfo;
 import com.stance.domain.period.ExpectedProjectDuration;
 import com.stance.domain.period.ExpectedRecruitmentDuration;
-import com.stance.domain.project.ProjectCommand;
-import com.stance.domain.project.ProjectInfo;
-import com.stance.domain.project.ProjectRepository;
 import com.stance.infra.crew.CrewInfoEntity;
 import com.stance.infra.project.ProjectEntity;
 import org.springframework.stereotype.Service;
@@ -39,14 +36,16 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectInfo createProject(ProjectInfo project) {
+    public ProjectInfo createProject(ProjectCommand.Create command) {
+        ProjectInfo projectInfo = command.projectInfo();
+
         ProjectEntity projectEntity = new ProjectEntity(
-                project.projectName(),
-                project.description(),
-                CrewInfo.toEntity(project.crewInfo()),
-                RecruitmentInfo.toEntity(project.recruitmentInfo()),
-                ExpectedProjectDuration.toEntity(project.expectedProjectDuration()),
-                ExpectedRecruitmentDuration.toEntity(project.expectedRecruitmentDuration())
+                projectInfo.projectName(),
+                projectInfo.description(),
+                CrewInfo.toEntity(projectInfo.crewInfo()),
+                RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
+                ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
+                ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
         );
         ProjectEntity savedProjectEntity = projectRepository.save(projectEntity);
         return ProjectInfo.from(savedProjectEntity);
@@ -71,6 +70,7 @@ public class ProjectService {
         return ProjectInfo.from(save);
     }
 
+    @Transactional
     public Boolean deleteProject(String projectName) {
         ProjectEntity projectEntity = projectRepository.getByProjectName(projectName);
         projectRepository.delete(projectEntity);

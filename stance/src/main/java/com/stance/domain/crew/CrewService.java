@@ -1,7 +1,7 @@
 package com.stance.domain.crew;
 
+import com.stance.domain.tools.Tools;
 import com.stance.infra.crew.CrewInfoEntity;
-import com.stance.infra.tools.ToolsMapper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +18,7 @@ public class CrewService {
                 command.githubEmail(),
                 command.nickName(),
                 command.position(),
-                ToolsMapper.toEntities(command.tools()),
+                Tools.toEntity(command.tools()),
                 command.years()
         );
 

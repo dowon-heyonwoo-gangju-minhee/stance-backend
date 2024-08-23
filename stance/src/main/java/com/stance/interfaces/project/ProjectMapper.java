@@ -39,4 +39,8 @@ public class ProjectMapper {
     public static ProjectDto.DeleteResponse toDeleteResponse(Boolean aBoolean, String projectName) {
         return new ProjectDto.DeleteResponse("ProjectName", "Deleted");
     }
+
+    public static ProjectCommand.Create toCreate(ProjectInfo project) {
+        return new ProjectCommand.Create(project);
+    }
 }

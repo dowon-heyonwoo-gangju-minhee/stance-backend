@@ -2,7 +2,7 @@ package com.stance.interfaces;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stance.application.ProjectService;
+import com.stance.domain.project.ProjectService;
 import com.stance.domain.crew.CrewInfo;
 import com.stance.domain.crew.RecruitmentInfo;
 import com.stance.domain.period.ExpectedProjectDuration;

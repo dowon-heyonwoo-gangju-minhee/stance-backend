@@ -1,12 +1,6 @@
 package com.stance.interfaces.project;
 
-import com.stance.application.ProjectService;
-import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.RecruitmentInfo;
-import com.stance.domain.period.ExpectedProjectDuration;
-import com.stance.domain.period.ExpectedRecruitmentDuration;
-import com.stance.domain.project.*;
-import com.stance.domain.tools.Tools;
+import com.stance.domain.project.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,15 +16,6 @@ import java.util.List;
 @Tag(name = "Project", description = "프로젝트 관리 API")
 public class ProjectController {
     private final ProjectService projectService;
-
-    ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-    ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-    CrewInfo crewInfo = new CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new Tools("tools")), 1L);
-    RecruitmentInfo recruitmentInfo =new RecruitmentInfo("position", List.of(new Tools("tools")), 1L);
-    ProjectInfo projectInfo = new ProjectInfo("ProjectName",
-            "Description", List.of(crewInfo)
-            , List.of(recruitmentInfo)
-            , expectedProjectDuration, expectedRecruitmentDuration);
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
@@ -66,7 +50,9 @@ public class ProjectController {
     public ProjectDto.CreationResponse createProject(@RequestBody ProjectDto.CreationRequest request) {
         request.validate();
         return new ProjectDto.CreationResponse(
-                projectService.createProject(request.project())
+                projectService.createProject(
+                        ProjectMapper.toCreate(request.project())
+                )
         );
     }
 
@@ -79,7 +65,8 @@ public class ProjectController {
             @Parameter(description = "수정할 프로젝트 정보") @RequestBody ProjectDto.ModifyRequest request)
      {
         return ProjectMapper.toPatchResponse(
-                projectService.patchProject(ProjectMapper.toPatch(projectName,request))
+                projectService.patchProject(
+                        ProjectMapper.toPatch(projectName,request))
         );
     }
 
