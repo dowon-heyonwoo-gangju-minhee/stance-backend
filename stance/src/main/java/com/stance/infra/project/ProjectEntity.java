@@ -39,7 +39,6 @@ public class ProjectEntity {
     private ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity;
 
 
-
     public ProjectEntity(String projectName, String description,
                          CrewInfoEntity crewInfoEntity, List<RecruitmentInfoEntity> recruitmentInfoEntity,
                          ExpectedProjectDurationEntity expectedProjectDurationEntity,
@@ -67,6 +66,7 @@ public class ProjectEntity {
         this.expectedRecruitmentDurationEntity = expectedRecruitmentDurationEntity;
         setOwner(crewInfoEntity);
     }
+
     public CrewInfoEntity getOwner() {
         return memberships.stream()
                 .filter(pm -> pm.getRole() == MemberRole.OWNER)
@@ -74,6 +74,7 @@ public class ProjectEntity {
                 .map(MembershipEntity::getCrew)
                 .orElse(null);
     }
+
     public void setOwner(CrewInfoEntity owner) {
         MembershipEntity ownerMembership =
                 new MembershipEntity(this, owner, MemberRole.OWNER, LocalDateTime.now());
@@ -84,5 +85,24 @@ public class ProjectEntity {
         MembershipEntity membership =
                 new MembershipEntity(this, member, MemberRole.MEMBER, LocalDateTime.now());
         memberships.add(membership);
+    }
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStatus status = ProjectStatus.RECRUITING;
+
+
+    public void completeRecruitment() {
+        if (this.status == ProjectStatus.RECRUITING) {
+            this.status = ProjectStatus.COMPLETED;
+            for (MembershipEntity membership : memberships) {
+                membership.getCrew().incrementProjectParticipation();
+            }
+        }
+    }
+
+    public void reopenRecruitment() {
+        if (this.status == ProjectStatus.COMPLETED) {
+            this.status = ProjectStatus.RECRUITING;
+        }
     }
 }

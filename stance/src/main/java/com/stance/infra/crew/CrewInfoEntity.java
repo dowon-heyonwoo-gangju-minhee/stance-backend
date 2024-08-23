@@ -48,4 +48,8 @@ public class CrewInfoEntity {
     public CrewInfoEntity() {
 
     }
+
+    public void incrementProjectParticipation() {
+        this.years++;
+    }
 }

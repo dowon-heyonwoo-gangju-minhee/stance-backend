@@ -12,4 +12,7 @@ public class ProjectCommand {
     public record Patch(String projectName, ProjectInfo projectInfo){
 
     }
+
+    public record State(com.stance.interfaces.project.ProjectDto.CompleteRequest request) {
+    }
 }

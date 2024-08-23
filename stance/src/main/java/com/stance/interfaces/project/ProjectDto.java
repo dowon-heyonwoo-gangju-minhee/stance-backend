@@ -37,4 +37,18 @@ public class ProjectDto {
 
     public record ModifyRequest(ProjectInfo projectInfo) {
     }
+
+    public record CompleteResponse(String projectName, String message) {
+    }
+
+    public record CompleteRequest(String projectName, String message) {
+        public void validate(){
+            if(projectName == null || projectName.isBlank()){
+                throw new IllegalArgumentException("projectName is null or empty");
+            }
+            if(message == null || message.isBlank()){
+                throw new IllegalArgumentException("message is null or empty");
+            }
+        }
+    }
 }

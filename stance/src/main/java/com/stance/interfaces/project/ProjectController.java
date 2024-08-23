@@ -83,4 +83,19 @@ public class ProjectController {
                 projectFacade.deleteProject(projectName), projectName
         );
     }
+
+    @Operation(summary = "프로젝트 모집 완료", description = "지정된 프로젝트의 모집을 완료합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 모집 완료 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDto.CompleteResponse.class)))
+    @PatchMapping("/{projectName}/toggle-recruitment")
+    public ProjectDto.CompleteResponse toggleRecruitment(
+            @Parameter(description = "모집 완료할 프로젝트의 ID") @PathVariable String projectName,
+            @RequestBody ProjectDto.CompleteRequest request
+            ) {
+        request.validate();
+        return ProjectMapper.toCompleteResponse(
+                projectFacade.toggleRecruitment(
+                        ProjectMapper.toState(request)), projectName
+        );
+    }
 }

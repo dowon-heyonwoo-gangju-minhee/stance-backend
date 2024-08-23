@@ -59,8 +59,6 @@ class ProjectControllerTest {
     private final String projectName = "ProjectName";
     ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName, crewEmail);
     ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(projectInfo);
-    ProjectDto.ProjectResponse projectResponse = new ProjectDto.ProjectResponse(projectInfo);
-
 
 
     @Test
