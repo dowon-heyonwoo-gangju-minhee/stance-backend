@@ -4,6 +4,7 @@ import com.stance.domain.project.ProjectRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ProjectRepositoryImpl implements ProjectRepository {
@@ -24,8 +25,9 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     }
 
     @Override
-    public ProjectEntity getByProjectName(String projectName) {
-        return projectJPARepository.findByProjectName(projectName);
+    public Optional<ProjectEntity> getByProjectName(String projectName) {
+        ProjectEntity byProjectName = projectJPARepository.findByProjectName(projectName);
+        return Optional.ofNullable(byProjectName);
     }
 
     @Override

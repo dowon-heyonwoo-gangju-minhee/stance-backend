@@ -13,7 +13,9 @@ import com.stance.infra.crew.CrewInfoEntity;
 import com.stance.infra.membership.MemberRole;
 import com.stance.infra.membership.MembershipEntity;
 import com.stance.infra.project.ProjectEntity;
+import com.stance.infra.project.ProjectParticipationTracker;
 import com.stance.infra.project.ProjectStatus;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +26,13 @@ public class ProjectFacade {
     private final ProjectService projectService;
     private final MembershipService membershipService;
     private final CrewService crewService;
+    private final ProjectParticipationTracker participationTracker;
 
-    public ProjectFacade(ProjectService projectService, MembershipService membershipService, CrewService crewService) {
+    public ProjectFacade(ProjectService projectService, MembershipService membershipService, CrewService crewService, ProjectParticipationTracker participationTracker) {
         this.projectService = projectService;
         this.membershipService = membershipService;
         this.crewService = crewService;
+        this.participationTracker = participationTracker;
     }
 
     @Transactional
@@ -89,16 +93,17 @@ public class ProjectFacade {
         return true;
     }
 
-    public Boolean toggleRecruitment(ProjectCommand.State state){
+    public Boolean toggleRecruitment(ProjectCommand.State state) {
         String projectName = state.request().projectName();
         ProjectEntity projectEntity = projectService.getByProjectName(projectName);
-        if(projectEntity.getStatus() == ProjectStatus.COMPLETED){
+        if (projectEntity.getStatus() == ProjectStatus.COMPLETED) {
             projectEntity.reopenRecruitment();
             projectService.save(projectEntity);
             return false;
         }
-        projectEntity.completeRecruitment();
+        projectEntity.completeRecruitment(participationTracker);
         projectService.save(projectEntity);
         return true;
     }
 }
+

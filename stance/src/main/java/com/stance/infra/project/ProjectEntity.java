@@ -91,8 +91,13 @@ public class ProjectEntity {
     private ProjectStatus status = ProjectStatus.RECRUITING;
 
 
-    public void completeRecruitment() {
-        if (this.status == ProjectStatus.RECRUITING) {
+
+    public void completeRecruitment(ProjectParticipationTracker tracker) {
+        if (this.status != ProjectStatus.RECRUITING) {
+            throw new IllegalStateException("Cannot complete recruitment for a project that is not in recruiting state");
+        }
+
+        if (tracker.markAsCompleted(this.id)) {
             this.status = ProjectStatus.COMPLETED;
             for (MembershipEntity membership : memberships) {
                 membership.getCrew().incrementProjectParticipation();

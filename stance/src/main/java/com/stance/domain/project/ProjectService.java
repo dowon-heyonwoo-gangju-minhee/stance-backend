@@ -1,6 +1,7 @@
 package com.stance.domain.project;
 
 import com.stance.infra.project.ProjectEntity;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ProjectService {
     }
 
     public ProjectEntity getByProjectName(String projectName) {
-        return projectRepository.getByProjectName(projectName);
+        return projectRepository.getByProjectName(projectName).orElseThrow(() -> new EntityNotFoundException("Project not found"));
     }
 
     public ProjectEntity save(ProjectEntity projectInfo) {
@@ -35,9 +36,11 @@ public class ProjectService {
     }
 
     public void checkDuplicateProjectName(String s) {
-        ProjectEntity byProjectName = projectRepository.getByProjectName(s);
+        ProjectEntity byProjectName = projectRepository.getByProjectName(s)
+                .orElse(null);
         if (byProjectName != null) {
             throw new IllegalArgumentException("Project name is duplicated");
         }
     }
+
 }

@@ -4,6 +4,7 @@ import com.stance.infra.membership.MembershipEntity;
 import com.stance.infra.tools.ToolsEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class CrewInfoEntity {
 
     private Long years;
 
+    private Long involvements = 0L;
+
     public CrewInfoEntity(String githubName, String githubEmail, String nickName, String position, List<ToolsEntity> tools, Long years) {
         this.githubName = githubName;
         this.githubEmail = githubEmail;
@@ -49,7 +52,12 @@ public class CrewInfoEntity {
 
     }
 
+    @Version
+    private Long version;
+
+
+    @Transactional
     public void incrementProjectParticipation() {
-        this.years++;
+        this.involvements++;
     }
 }
