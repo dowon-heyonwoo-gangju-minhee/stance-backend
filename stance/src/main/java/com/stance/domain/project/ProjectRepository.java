@@ -12,4 +12,6 @@ public interface ProjectRepository {
     ProjectEntity getByProjectName(String projectName);
 
     void delete(ProjectEntity projectEntity);
+
+    Long getIdByProjectName(String projectName);
 }

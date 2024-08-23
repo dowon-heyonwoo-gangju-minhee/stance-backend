@@ -2,15 +2,17 @@ package com.stance.interfaces;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stance.application.ProjectService;
+import com.stance.application.ProjectFacade;
+import com.stance.domain.project.ProjectService;
 import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.RecruitmentInfo;
+import com.stance.domain.recruitment.RecruitmentInfo;
 import com.stance.domain.period.ExpectedProjectDuration;
 import com.stance.domain.period.ExpectedRecruitmentDuration;
 import com.stance.domain.project.*;
 import com.stance.domain.tools.Tools;
 import com.stance.interfaces.project.ProjectController;
 import com.stance.interfaces.project.ProjectDto;
+import com.stance.interfaces.project.ProjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +26,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,20 +42,23 @@ class ProjectControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    private ProjectFacade projectFacade;
+
+    @MockBean
     private ProjectService projectService;
 
-
-    ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-    ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
+    ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+    ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(), LocalDateTime.now().plusDays(7));
     List<Tools> tools = Collections.singletonList(new Tools("tools"));
+    private final String crewEmail = "crewEmail";
     ProjectInfo projectInfo = new ProjectInfo("ProjectName",
-            "Description",List.of(new CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new Tools("react")), 1L))
-            , List.of(new RecruitmentInfo("position",List.of(new Tools("react")), 1L))
+            "Description", new CrewInfo("githubName", "githubEmail", "nickName", "position", tools, 1L)
+            , List.of(new RecruitmentInfo("position", List.of(new Tools("react")), 1L))
             , expectedProjectDuration, expectedRecruitmentDuration);
 
     private final String projectName = "ProjectName";
-    ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName,);
-    ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(enrollInfo,projectInfo);
+    ProjectDto.EnrollRequest enrollRequest = new ProjectDto.EnrollRequest(projectName, crewEmail);
+    ProjectDto.CreationRequest creationRequest = new ProjectDto.CreationRequest(projectInfo);
 
 
     @Test
@@ -75,19 +81,20 @@ class ProjectControllerTest {
         ProjectDto.ProjectResponse firstProject = projectResponses.getFirst();
         assertEquals("ProjectName", firstProject.projectInfo().projectName());
         assertEquals("Description", firstProject.projectInfo().description());
-        // 추가적인 필드 검증...
     }
+
     @Test
     void enrollProject() throws Exception {
-        mockMvc.perform(post(basePath+"/enroll")
+        when(projectFacade.enrollProject(ProjectMapper.toEnroll(enrollRequest)))
+                .thenReturn(projectInfo);
+        mockMvc.perform(post(basePath + "/enroll")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(enrollRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.enrollInfo.position").value("position"))
-                .andExpect(jsonPath("$.enrollInfo.tools[0]").value("tools"))
-                .andExpect(jsonPath("$.enrollInfo.years").value("4"))
-                .andExpect(jsonPath("$.enrollInfo.involvements").value(1));
+                .andExpect(jsonPath("$.projectInfo.crewInfo.position").value("position"))
+                .andExpect(jsonPath("$.projectInfo.crewInfo.years").value(1));
     }
+
     @Test
     void createProject() throws Exception {
         mockMvc.perform(post(basePath)
@@ -95,22 +102,28 @@ class ProjectControllerTest {
                         .content(objectMapper.writeValueAsString(creationRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.projectInfo.projectName").value("ProjectName"))
-                .andExpect(jsonPath("$.projectInfo.description").value("Description"))
-                .andExpect(jsonPath("$.projectInfo.crewInfo.crewInfo").value("recruitmentInfo"));
+                .andExpect(jsonPath("$.projectInfo.description").value("Description"));
     }
+
     @Test
     void updateProject() throws Exception {
-        mockMvc.perform(patch(basePath+"/{projectId}",1L))
+        when(projectFacade.patchProject(any(ProjectCommand.Patch.class)))
+                .thenReturn(projectInfo);
+        mockMvc.perform(patch(basePath + "/{projectName}", "ProjectName")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(creationRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.projectInfo.projectName").value("ProjectName"))
-                .andExpect(jsonPath("$.projectInfo.description").value("Description"))
-                .andExpect(jsonPath("$.projectInfo.crewInfo.crewInfo").value("recruitmentInfo"));
+                .andExpect(jsonPath("$.projectInfo.description").value("Description"));
     }
+
     @Test
     void deleteProject() throws Exception {
-        mockMvc.perform(delete(basePath+"/{projectId}",1L))
+        when(projectFacade.deleteProject("ProjectName"))
+                .thenReturn(true);
+        mockMvc.perform(delete(basePath + "/{projectName}", "ProjectName"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("deleted"));
+                .andExpect(jsonPath("$.message").value("Deleted"));
     }
 
 

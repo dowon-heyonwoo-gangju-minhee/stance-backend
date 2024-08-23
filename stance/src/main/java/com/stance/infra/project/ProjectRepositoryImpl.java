@@ -32,4 +32,9 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     public void delete(ProjectEntity projectEntity) {
         projectJPARepository.delete(projectEntity);
     }
+
+    @Override
+    public Long getIdByProjectName(String projectName) {
+        return projectJPARepository.getIdByProjectName(projectName);
+    }
 }

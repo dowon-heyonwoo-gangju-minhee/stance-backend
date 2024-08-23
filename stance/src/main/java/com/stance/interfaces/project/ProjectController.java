@@ -1,12 +1,7 @@
 package com.stance.interfaces.project;
 
-import com.stance.application.ProjectService;
-import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.RecruitmentInfo;
-import com.stance.domain.period.ExpectedProjectDuration;
-import com.stance.domain.period.ExpectedRecruitmentDuration;
-import com.stance.domain.project.*;
-import com.stance.domain.tools.Tools;
+import com.stance.application.ProjectFacade;
+import com.stance.domain.project.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,25 +10,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
 @Tag(name = "Project", description = "프로젝트 관리 API")
 public class ProjectController {
+    private final ProjectFacade projectFacade;
     private final ProjectService projectService;
 
-    ExpectedProjectDuration expectedProjectDuration = new ExpectedProjectDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-    ExpectedRecruitmentDuration expectedRecruitmentDuration = new ExpectedRecruitmentDuration(LocalDateTime.now(),LocalDateTime.now().plusDays(7));
-    CrewInfo crewInfo = new CrewInfo("githubName", "githubEmail", "nickName", "position", List.of(new Tools("tools")), 1L);
-    RecruitmentInfo recruitmentInfo =new RecruitmentInfo("position", List.of(new Tools("tools")), 1L);
-    ProjectInfo projectInfo = new ProjectInfo("ProjectName",
-            "Description", List.of(crewInfo)
-            , List.of(recruitmentInfo)
-            , expectedProjectDuration, expectedRecruitmentDuration);
-
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectFacade projectFacade, ProjectService projectService) {
+        this.projectFacade = projectFacade;
         this.projectService = projectService;
     }
 
@@ -53,7 +40,7 @@ public class ProjectController {
     public ProjectDto.EnrollResponse enrollProject(@RequestBody ProjectDto.EnrollRequest request) {
         request.validate();
         return ProjectMapper.toPostResponse(
-                projectService.enrollProject(
+                projectFacade.enrollProject(
                         ProjectMapper.toEnroll(request)
                 )
         );
@@ -66,7 +53,9 @@ public class ProjectController {
     public ProjectDto.CreationResponse createProject(@RequestBody ProjectDto.CreationRequest request) {
         request.validate();
         return new ProjectDto.CreationResponse(
-                projectService.createProject(request.project())
+                projectFacade.createProject(
+                        ProjectMapper.toCreate(request.project())
+                )
         );
     }
 
@@ -79,7 +68,8 @@ public class ProjectController {
             @Parameter(description = "수정할 프로젝트 정보") @RequestBody ProjectDto.ModifyRequest request)
      {
         return ProjectMapper.toPatchResponse(
-                projectService.patchProject(ProjectMapper.toPatch(projectName,request))
+                projectFacade.patchProject(
+                        ProjectMapper.toPatch(projectName,request))
         );
     }
 
@@ -90,7 +80,22 @@ public class ProjectController {
     public ProjectDto.DeleteResponse deleteProject(
             @Parameter(description = "삭제할 프로젝트의 ID") @PathVariable String projectName) {
         return ProjectMapper.toDeleteResponse(
-                projectService.deleteProject(projectName), projectName
+                projectFacade.deleteProject(projectName), projectName
+        );
+    }
+
+    @Operation(summary = "프로젝트 모집 완료", description = "지정된 프로젝트의 모집을 완료합니다.")
+    @ApiResponse(responseCode = "200", description = "프로젝트 모집 완료 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDto.CompleteResponse.class)))
+    @PatchMapping("/{projectName}/toggle-recruitment")
+    public ProjectDto.CompleteResponse toggleRecruitment(
+            @Parameter(description = "모집 완료할 프로젝트의 ID") @PathVariable String projectName,
+            @RequestBody ProjectDto.CompleteRequest request
+            ) {
+        request.validate();
+        return ProjectMapper.toCompleteResponse(
+                projectFacade.toggleRecruitment(
+                        ProjectMapper.toState(request)), projectName
         );
     }
 }

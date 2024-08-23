@@ -1,4 +1,4 @@
-package com.stance.infra.crew;
+package com.stance.infra.recruitment;
 
 import com.stance.infra.tools.ToolsEntity;
 import jakarta.persistence.Entity;

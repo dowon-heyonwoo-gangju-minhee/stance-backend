@@ -23,7 +23,7 @@ public class ProjectMapper {
     }
 
     public static ProjectCommand.Apply toEnroll(ProjectDto.EnrollRequest request) {
-        return new ProjectCommand.Apply(request.projectName(), request.crewInfo());
+        return new ProjectCommand.Apply(request.projectName(), request.crewEmail());
     }
 
     public static ProjectDto.ProjectResponse toPatchResponse(ProjectInfo projectInfo) {
@@ -37,6 +37,24 @@ public class ProjectMapper {
     }
 
     public static ProjectDto.DeleteResponse toDeleteResponse(Boolean aBoolean, String projectName) {
-        return new ProjectDto.DeleteResponse("ProjectName", "Deleted");
+        if(aBoolean) {
+            return new ProjectDto.DeleteResponse(projectName, "Deleted");
+        }
+        return new ProjectDto.DeleteResponse(projectName, "Not Deleted");
+    }
+
+    public static ProjectCommand.Create toCreate(ProjectInfo project) {
+        return new ProjectCommand.Create(project);
+    }
+
+    public static ProjectDto.CompleteResponse toCompleteResponse(Boolean aBoolean, String projectName) {
+        if(aBoolean) {
+            return new ProjectDto.CompleteResponse(projectName, "Completed");
+        }
+        return new ProjectDto.CompleteResponse(projectName, "Not Completed");
+    }
+
+    public static ProjectCommand.State toState(ProjectDto.CompleteRequest request) {
+        return new ProjectCommand.State(request);
     }
 }
