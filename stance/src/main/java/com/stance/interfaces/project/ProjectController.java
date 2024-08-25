@@ -33,6 +33,49 @@ public class ProjectController {
                 projectService.getProjects());
     }
 
+    @Operation(summary = "스택으로 필터링된 프로젝트", description = "지정된 프로젝트들의 정보를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "성공적으로 프로젝트 정보를 반환함",
+            content = @Content(schema = @Schema(implementation = ProjectDto.ProjectResponse.class)))
+    @GetMapping("/filter")
+    public List<ProjectDto.ProjectResponse> getFilteredProjects(@RequestBody ProjectDto.FilterRequest request) {
+        request.validate();
+        return ProjectMapper.toGetResponse(
+                projectService.getFilteredProjects(
+                        ProjectMapper.toFilter(request)
+                )
+        );
+    }
+
+    @Operation(summary = "기간으로 필터링된 프로젝트", description = "지정된 기간의 프로젝트들의 정보를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "성공적으로 프로젝트 정보를 반환함",
+            content = @Content(schema = @Schema(implementation = ProjectDto.ProjectResponse.class)))
+    @GetMapping("/filter")
+    public List<ProjectDto.ProjectResponse> getFilteredProjects(@RequestBody ProjectDto.DateFilterRequest request) {
+        request.validate();
+        return ProjectMapper.toGetResponse(
+                projectService.getProjectsByDuration(
+                        ProjectMapper.toDateFilter(request)
+                )
+        );
+    }
+
+    @Operation(summary = "포지션으로 필터링된 프로젝트", description = "지정된 포지션의 프로젝트들의 정보를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "성공적으로 프로젝트 정보를 반환함",
+            content = @Content(schema = @Schema(implementation = ProjectDto.ProjectResponse.class)))
+    @GetMapping("/filter")
+    public List<ProjectDto.ProjectResponse> getFilteredProjects(@RequestBody ProjectDto.PositionFilterRequest request) {
+        request.validate();
+        return ProjectMapper.toGetResponse(
+                projectService.getProjectsByPosition(
+                        ProjectMapper.toPositionFilter(request)
+                )
+        );
+    }
+
+
+
+
+
     @Operation(summary = "프로젝트 등록", description = "새로운 프로젝트 등록 정보를 제출합니다.")
     @ApiResponse(responseCode = "200", description = "프로젝트 등록 성공",
             content = @Content(schema = @Schema(implementation = ProjectDto.EnrollResponse.class)))

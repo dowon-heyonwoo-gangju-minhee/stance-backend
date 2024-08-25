@@ -1,11 +1,16 @@
 package com.stance.infra.crew;
 
+import com.stance.infra.like.CrewLikeEntity;
+import com.stance.infra.like.ProjectLikeEntity;
 import com.stance.infra.membership.MembershipEntity;
+import com.stance.infra.project.ProjectEntity;
 import com.stance.infra.tools.ToolsEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,6 +23,12 @@ public class CrewInfoEntity {
 
     @Getter
     private String githubName;
+
+    @OneToMany(mappedBy = "crew")
+    private List<ProjectLikeEntity> likedProjects = new ArrayList<>();
+
+    @OneToMany(mappedBy = "liker")
+    private List<CrewLikeEntity> likedCrews = new ArrayList<>();
 
     @Getter
     private String githubEmail;
@@ -59,5 +70,14 @@ public class CrewInfoEntity {
     @Transactional
     public void incrementProjectParticipation() {
         this.involvements++;
+    }
+    public void addLikedProject(ProjectEntity project) {
+        ProjectLikeEntity like = new ProjectLikeEntity(project, this, LocalDateTime.now());
+        this.likedProjects.add(like);
+    }
+
+    public void addLikedCrew(CrewInfoEntity likedCrew) {
+        CrewLikeEntity like = new CrewLikeEntity(this, likedCrew, LocalDateTime.now());
+        this.likedCrews.add(like);
     }
 }

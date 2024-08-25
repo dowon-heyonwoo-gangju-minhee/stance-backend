@@ -57,4 +57,18 @@ public class ProjectMapper {
     public static ProjectCommand.State toState(ProjectDto.CompleteRequest request) {
         return new ProjectCommand.State(request);
     }
+
+    public static ProjectCommand.Filter toFilter(ProjectDto.FilterRequest request) {
+        return new ProjectCommand.Filter(request.tools());
+
+    }
+
+    public static ProjectCommand.DateFilter toDateFilter(ProjectDto.DateFilterRequest request) {
+        return new ProjectCommand.DateFilter(request.durationMonth());
+    }
+
+    public static ProjectCommand.PositionFilter toPositionFilter(ProjectDto.PositionFilterRequest request) {
+        return new ProjectCommand.PositionFilter(request.position());
+
+    }
 }

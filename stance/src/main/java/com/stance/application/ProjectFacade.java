@@ -1,7 +1,7 @@
 package com.stance.application;
 
 import com.stance.domain.crew.CrewInfo;
-import com.stance.domain.crew.CrewService;
+import com.stance.domain.crew.CrewInfoService;
 import com.stance.domain.recruitment.RecruitmentInfo;
 import com.stance.domain.membership.MembershipService;
 import com.stance.domain.period.ExpectedProjectDuration;
@@ -15,7 +15,6 @@ import com.stance.infra.membership.MembershipEntity;
 import com.stance.infra.project.ProjectEntity;
 import com.stance.infra.project.ProjectParticipationTracker;
 import com.stance.infra.project.ProjectStatus;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +24,10 @@ import java.time.LocalDateTime;
 public class ProjectFacade {
     private final ProjectService projectService;
     private final MembershipService membershipService;
-    private final CrewService crewService;
+    private final CrewInfoService crewService;
     private final ProjectParticipationTracker participationTracker;
 
-    public ProjectFacade(ProjectService projectService, MembershipService membershipService, CrewService crewService, ProjectParticipationTracker participationTracker) {
+    public ProjectFacade(ProjectService projectService, MembershipService membershipService, CrewInfoService crewService, ProjectParticipationTracker participationTracker) {
         this.projectService = projectService;
         this.membershipService = membershipService;
         this.crewService = crewService;
@@ -37,13 +36,14 @@ public class ProjectFacade {
 
     @Transactional
     public ProjectInfo enrollProject(ProjectCommand.Apply command) {
-        ProjectEntity projectInfo = projectService.getByProjectName(command.projectName());
+        ProjectInfo projectInfo = projectService.getByProjectName(command.projectName());
         CrewInfo crewInfo = crewService.getCrew(command.crewEmail());
-        CrewInfoEntity entity = CrewInfo.toEntity(crewInfo);
-        projectInfo.addMember(entity);
-        ProjectEntity savedProjectEntity = projectService.save(projectInfo);
+        CrewInfoEntity entity = CrewInfo.to(crewInfo);
+        ProjectEntity entity1 = ProjectInfo.toEntity(projectInfo);
+        entity1.addMember(entity);
+        ProjectEntity savedProjectEntity = projectService.save(entity1);
         MembershipEntity membershipEntity = new MembershipEntity(
-                projectInfo,
+                entity1,
                 entity,
                 MemberRole.MEMBER,
                 LocalDateTime.now()
@@ -59,7 +59,8 @@ public class ProjectFacade {
         ProjectEntity projectEntity = new ProjectEntity(
                 projectInfo.projectName(),
                 projectInfo.description(),
-                CrewInfo.toEntity(projectInfo.crewInfo()),
+                projectInfo.tools(),
+                CrewInfo.to(projectInfo.crewInfo()),
                 RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
                 ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
                 ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
@@ -77,7 +78,8 @@ public class ProjectFacade {
                 id,
                 projectInfo.projectName(),
                 projectInfo.description(),
-                CrewInfo.toEntity(projectInfo.crewInfo()),
+                projectInfo.tools(),
+                CrewInfo.to(projectInfo.crewInfo()),
                 RecruitmentInfo.toEntity(projectInfo.recruitmentInfo()),
                 ExpectedProjectDuration.toEntity(projectInfo.expectedProjectDuration()),
                 ExpectedRecruitmentDuration.toEntity(projectInfo.expectedRecruitmentDuration())
@@ -88,14 +90,15 @@ public class ProjectFacade {
 
     @Transactional
     public Boolean deleteProject(String projectName) {
-        ProjectEntity projectEntity = projectService.getByProjectName(projectName);
-        projectService.delete(projectEntity);
+        ProjectInfo byProjectName = projectService.getByProjectName(projectName);
+        projectService.delete(byProjectName);
         return true;
     }
 
     public Boolean toggleRecruitment(ProjectCommand.State state) {
         String projectName = state.request().projectName();
-        ProjectEntity projectEntity = projectService.getByProjectName(projectName);
+        ProjectInfo target = projectService.getByProjectName(projectName);
+        ProjectEntity projectEntity = ProjectInfo.toEntity(target);
         if (projectEntity.getStatus() == ProjectStatus.COMPLETED) {
             projectEntity.reopenRecruitment();
             projectService.save(projectEntity);

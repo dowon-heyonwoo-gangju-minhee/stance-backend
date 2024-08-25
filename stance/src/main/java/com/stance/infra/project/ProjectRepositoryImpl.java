@@ -1,6 +1,7 @@
 package com.stance.infra.project;
 
 import com.stance.domain.project.ProjectRepository;
+import com.stance.infra.tools.ToolsEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -38,5 +39,20 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public Long getIdByProjectName(String projectName) {
         return projectJPARepository.getIdByProjectName(projectName);
+    }
+
+    @Override
+    public List<ProjectEntity> getFilteredProjects(List<ToolsEntity> tools) {
+        return projectJPARepository.findByToolsIn(tools);
+    }
+
+    @Override
+    public List<ProjectEntity> getProjectsByDuration(Long durationMonths) {
+        return projectJPARepository.findByDurationMonths(durationMonths);
+    }
+
+    @Override
+    public List<ProjectEntity> getProjectsByPosition(String position) {
+        return projectJPARepository.findByPosition(position);
     }
 }

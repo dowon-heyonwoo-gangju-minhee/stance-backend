@@ -3,6 +3,10 @@ package com.stance.interfaces.project;
 
 import com.stance.domain.crew.CrewInfo;
 import com.stance.domain.project.ProjectInfo;
+import com.stance.domain.tools.Tools;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProjectDto {
 
@@ -48,6 +52,30 @@ public class ProjectDto {
             }
             if(message == null || message.isBlank()){
                 throw new IllegalArgumentException("message is null or empty");
+            }
+        }
+    }
+
+    public record FilterRequest(List<Tools> tools) {
+        public void validate(){
+            if(tools == null || tools.isEmpty()){
+                throw new IllegalArgumentException("tools is null or empty");
+            }
+        }
+    }
+
+    public record DateFilterRequest(Long durationMonth ) {
+        public void validate(){
+            if(durationMonth == null || durationMonth <= 0){
+                throw new IllegalArgumentException("durationMonth is null or empty");
+            }
+        }
+    }
+
+    public record PositionFilterRequest(String position) {
+        public void validate(){
+            if(position == null || position.isBlank()){
+                throw new IllegalArgumentException("position is null or empty");
             }
         }
     }

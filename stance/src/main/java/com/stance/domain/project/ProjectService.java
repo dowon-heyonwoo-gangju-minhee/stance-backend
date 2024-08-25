@@ -1,11 +1,13 @@
 package com.stance.domain.project;
 
+import com.stance.domain.tools.Tools;
 import com.stance.infra.project.ProjectEntity;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+@Transactional
 @Component
 public class ProjectService {
     private final ProjectRepository projectRepository;
@@ -19,15 +21,18 @@ public class ProjectService {
         return ProjectInfo.from(projectEntities);
     }
 
-    public ProjectEntity getByProjectName(String projectName) {
-        return projectRepository.getByProjectName(projectName).orElseThrow(() -> new EntityNotFoundException("Project not found"));
+    public ProjectInfo getByProjectName(String projectName) {
+        ProjectEntity projectEntity = projectRepository.getByProjectName(projectName)
+                .orElseThrow(EntityNotFoundException::new);
+        return ProjectInfo.from(projectEntity);
     }
 
     public ProjectEntity save(ProjectEntity projectInfo) {
         return projectRepository.save(projectInfo);
     }
 
-    public void delete(ProjectEntity projectEntity) {
+    public void delete(ProjectInfo projectInfo) {
+        ProjectEntity projectEntity = ProjectInfo.toEntity(projectInfo);
         projectRepository.delete(projectEntity);
     }
 
@@ -43,4 +48,17 @@ public class ProjectService {
         }
     }
 
+    public List<ProjectInfo> getFilteredProjects(ProjectCommand.Filter filter) {
+        List<ProjectEntity> projectEntities = projectRepository.getFilteredProjects(Tools.toEntity(filter.tools()));
+        return ProjectInfo.from(projectEntities);
+    }
+    public List<ProjectInfo> getProjectsByDuration(ProjectCommand.DateFilter dateFilter) {
+        List<ProjectEntity> projectEntities = projectRepository.getProjectsByDuration(dateFilter.durationMonths());
+        return ProjectInfo.from(projectEntities);
+    }
+
+    public List<ProjectInfo> getProjectsByPosition(ProjectCommand.PositionFilter positionFilter) {
+        List<ProjectEntity> projectEntities = projectRepository.getProjectsByPosition(positionFilter.position());
+        return ProjectInfo.from(projectEntities);
+    }
 }

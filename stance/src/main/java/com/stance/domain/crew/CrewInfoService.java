@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class CrewService {
-    private final CrewRepository crewRepository;
+public class CrewInfoService {
+    private final CrewInfoRepository crewInfoRepository;
 
-    public CrewService(CrewRepository crewRepository) {
-        this.crewRepository = crewRepository;
+    public CrewInfoService(CrewInfoRepository crewInfoRepository) {
+        this.crewInfoRepository = crewInfoRepository;
     }
 
     @Transactional
@@ -24,13 +24,13 @@ public class CrewService {
                 command.years()
         );
 
-        CrewInfoEntity save = crewRepository.save(crewInfoEntity);
+        CrewInfoEntity save = crewInfoRepository.save(crewInfoEntity);
         return CrewInfo.from(save);
     }
 
     @Transactional
     public CrewInfo getCrew(String crewEmail) {
-        CrewInfoEntity crewInfoEntity = crewRepository.getByCrewEmail(crewEmail);
+        CrewInfoEntity crewInfoEntity = crewInfoRepository.getByCrewEmail(crewEmail);
         return CrewInfo.from(crewInfoEntity);
 
     }

@@ -1,6 +1,6 @@
 package com.stance.interfaces.crew;
 
-import com.stance.domain.crew.CrewService;
+import com.stance.domain.crew.CrewInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/crews")
 public class CrewController {
-    private final CrewService crewService;
+    private final CrewInfoService crewService;
 
-    public CrewController(CrewService crewService) {
+    public CrewController(CrewInfoService crewService) {
         this.crewService = crewService;
     }
     @Operation(summary = "회원 가입", description = "회원을 가입합니다.")

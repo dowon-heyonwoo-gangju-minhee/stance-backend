@@ -1,15 +1,19 @@
 package com.stance.infra.project;
 
+import com.stance.domain.tools.Tools;
 import com.stance.infra.crew.CrewInfoEntity;
+import com.stance.infra.like.ProjectLikeEntity;
 import com.stance.infra.recruitment.RecruitmentInfoEntity;
 import com.stance.infra.membership.MemberRole;
 import com.stance.infra.membership.MembershipEntity;
 import com.stance.infra.period.ExpectedProjectDurationEntity;
 import com.stance.infra.period.ExpectedRecruitmentDurationEntity;
+import com.stance.infra.tools.ToolsEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,6 +30,14 @@ public class ProjectEntity {
     @JoinColumn(name = "project_id")
     private List<MembershipEntity> memberships;
 
+    @OneToMany(mappedBy = "project")
+    private List<ProjectLikeEntity> likes = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "project_id")
+    private List<ToolsEntity> tools;
+
+
     @OneToMany
     @JoinColumn(name = "project_id")
     private List<RecruitmentInfoEntity> recruitmentInfoEntity;
@@ -39,7 +51,7 @@ public class ProjectEntity {
     private ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity;
 
 
-    public ProjectEntity(String projectName, String description,
+    public ProjectEntity(String projectName, String description,List<Tools> tools,
                          CrewInfoEntity crewInfoEntity, List<RecruitmentInfoEntity> recruitmentInfoEntity,
                          ExpectedProjectDurationEntity expectedProjectDurationEntity,
                          ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity) {
@@ -55,7 +67,7 @@ public class ProjectEntity {
 
     }
 
-    public ProjectEntity(Long id, String projectName, String description,
+    public ProjectEntity(Long id, String projectName, String description, List<Tools> tools,
                          CrewInfoEntity crewInfoEntity, List<RecruitmentInfoEntity> recruitmentInfoEntity,
                          ExpectedProjectDurationEntity expectedProjectDurationEntity, ExpectedRecruitmentDurationEntity expectedRecruitmentDurationEntity) {
         this.id = id;
@@ -65,6 +77,10 @@ public class ProjectEntity {
         this.expectedProjectDurationEntity = expectedProjectDurationEntity;
         this.expectedRecruitmentDurationEntity = expectedRecruitmentDurationEntity;
         setOwner(crewInfoEntity);
+    }
+    public void addLike(CrewInfoEntity crew) {
+        ProjectLikeEntity like = new ProjectLikeEntity(this, crew, LocalDateTime.now());
+        this.likes.add(like);
     }
 
     public CrewInfoEntity getOwner() {

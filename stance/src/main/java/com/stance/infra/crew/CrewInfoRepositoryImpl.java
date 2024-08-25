@@ -1,13 +1,13 @@
 package com.stance.infra.crew;
 
-import com.stance.domain.crew.CrewRepository;
+import com.stance.domain.crew.CrewInfoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CrewRepositoryImpl implements CrewRepository {
+public class CrewInfoRepositoryImpl implements CrewInfoRepository {
     private final CrewJPARepository crewJPARepository;
 
-    public CrewRepositoryImpl(CrewJPARepository crewJPARepository) {
+    public CrewInfoRepositoryImpl(CrewJPARepository crewJPARepository) {
         this.crewJPARepository = crewJPARepository;
     }
 
